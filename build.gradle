@@ -23,7 +23,8 @@ sourceCompatibility = 1.8
 
 task runScratch(dependsOn: 'runtimeEta', type:JavaExec) {
     main = 'com.jrciii.Scratchy'
-    classpath = sourceSets.main.runtimeClasspath
+    classpath += sourceSets.main.runtimeClasspath
+    classpath += project.configurations.getByName('etaRuntime')
 }
 
 repositories {
