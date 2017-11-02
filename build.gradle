@@ -1,0 +1,35 @@
+buildscript {
+    repositories {
+        mavenLocal()
+
+        dependencies {
+            classpath 'com.typelead:gradle-eta:0.0.1-SNAPSHOT'
+        }
+    }
+}
+
+group 'com.jrciii'
+version '1.0-SNAPSHOT'
+
+
+apply plugin: 'java'
+apply plugin: 'eta'
+
+eta {
+    etlasVersion = '1.0.2.0'
+}
+
+sourceCompatibility = 1.8
+
+task runScratch(dependsOn: 'runtimeEta', type:JavaExec) {
+    main = 'com.jrciii.Scratchy'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+repositories {
+    mavenCentral()
+    dependencies {
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+        compile files("build/etlas/dist/build/Scratch/Scratch.jar")
+    }
+}

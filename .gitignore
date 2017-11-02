@@ -1,0 +1,10 @@
+.cabal-sandbox/
+.gradle/
+.idea/
+build/
+gradle/
+cabal.sandbox.config
+gradlew
+gradlew.bat
+..gitignore.swp
+
