@@ -1,9 +1,10 @@
 buildscript {
     repositories {
         mavenLocal()
-
+        jcenter()
         dependencies {
             classpath 'com.typelead:gradle-eta:0.0.1-SNAPSHOT'
+            classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
         }
     }
 }
@@ -11,9 +12,12 @@ buildscript {
 group 'com.jrciii'
 version '1.0-SNAPSHOT'
 
-
+apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
 apply plugin: 'eta'
+apply plugin: 'application'
+
+mainClassName = 'com.jrciii.Scratchy'
 
 eta {
     etlasVersion = '1.0.2.0'
@@ -34,3 +38,9 @@ repositories {
         compile files("build/etlas/dist/build/Scratch/Scratch.jar")
     }
 }
+
+shadowJar {
+    configurations = [project.configurations.getByName('etaRuntime')]
+}
+
+shadowJar.dependsOn runtimeEta
