@@ -5,9 +5,14 @@ build-type:          Simple
 extra-source-files:  ChangeLog.md
 cabal-version:       >=1.10
 
--- This is needed for now to allow `etlas deps` to run.
 library
   exposed-modules:     Scratch.Scratch
   build-depends:       base >=4.8 && <4.9
   hs-source-dirs:      src/main/eta
   default-language:    Haskell2010
+
+executable dummy
+  build-depends:       base >=4.8 && <4.9
+  hs-source-dirs:      src/main/eta
+  default-language:    Haskell2010
+  main-is:             Scratch/Main.hs

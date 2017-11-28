@@ -1,3 +1,6 @@
+import com.typelead.gradle.utils.EtlasCommand
+import org.gradle.api.internal.file.collections.SimpleFileCollection
+
 buildscript {
     repositories {
         mavenLocal()
@@ -20,15 +23,29 @@ apply plugin: 'application'
 mainClassName = 'com.jrciii.Scratchy'
 
 eta {
-    etlasVersion = '1.0.2.0'
+    //useSystemEtlas = true
+    etlasVersion = '1.1.0.0'
 }
 
 sourceCompatibility = 1.8
 
-task runScratch(dependsOn: 'runtimeEta', type:JavaExec) {
-    main = 'com.jrciii.Scratchy'
-    classpath += sourceSets.main.runtimeClasspath
-    classpath += project.configurations.getByName('etaRuntime')
+task compileJ(dependsOn:'compileEta', type:JavaCompile) {
+    source = fileTree(dir: 'src/main/java', include: '**/*.java')
+    destinationDir = file('build/classes/main')
+    classpath = files {
+        def c = new EtlasCommand(getProject(), eta)
+        new SimpleFileCollection(getProject().files(c.depsClasspath("lib:scratch").toArray()).getFiles())
+    }
+}
+
+task runScratch(dependsOn:':compileJ', type:JavaExec) {
+    doFirst {
+        def c = new EtlasCommand(getProject(), eta)
+        classpath += new SimpleFileCollection(getProject().files(c.depsClasspath("lib:scratch").toArray()).getFiles())
+        main = 'com.jrciii.Scratchy'
+        classpath += sourceSets.main.runtimeClasspath
+    }
+
 }
 
 repositories {
@@ -39,8 +56,18 @@ repositories {
     }
 }
 
-shadowJar {
-    configurations = [project.configurations.getByName('etaRuntime')]
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Java Main and Eta Lib Fat Jar',
+                'Implementation-Version': version,
+                'Main-Class': 'com.jrciii.Scratchy'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.plus(files {
+        def c = new EtlasCommand(getProject(), eta)
+        getProject().files(c.depsClasspath("lib:scratch").toArray()).getFiles()
+    }).collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }
 
-shadowJar.dependsOn runtimeEta
+fatJar.dependsOn ':compileJ'
